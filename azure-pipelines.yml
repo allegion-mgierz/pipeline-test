@@ -4,11 +4,24 @@ trigger:
 - main  # automatically triggers this pipeline when changes are made to the 'main' branch.
 
 # This defines the pool where the pipeline will run.
-# 'ubuntu-latest' specifies the virtual machine image for executing tasks.
 pool:
   name: Controller-Plattform-Docker-Agent-Pool
 
 # Steps contain the individual tasks or actions that the pipeline will execute.
 steps:
-- script: echo Hello, world!  # A script task to run shell commands. This one prints "Hello, world!".
-  displayName: 'Run my first pipeline script'  # A friendly name for this step, making it easier to identify in the pipeline logs.
+- script: |
+    sudo apt-get update
+    sudo apt-get install -y cmake g++
+  displayName: 'Install CMake and GCC'
+
+- script: |
+    cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+  displayName: 'Configure CMake'
+
+- script: |
+    cmake --build build --config Release
+  displayName: 'Build project'
+
+- script: |
+    cd build && ctest --output-on-failure
+  displayName: 'Run tests'
